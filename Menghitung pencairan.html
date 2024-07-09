@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perhitungan Gadai</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-image: url('images/poster.jpg'); /* Path relatif ke gambar latar belakang */
+            background-size: cover;
+            background-position: center;
+        }
+        .container {
+            max-width: 90%;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8); /* Memberikan sedikit transparansi untuk membedakan dengan gambar latar belakang */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="number"], button {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            max-width: 300px;
+            font-size: 18px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        #hasil {
+            text-align: left;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PENCAIRAN YANG DITERIMA</h1>
+        <input type="number" id="pinjamanPokokInput" placeholder="Masukkan nilai pinjaman pokok" step="any">
+        <button onclick="hitungGadai()">Hitung</button>
+        <div id="hasil"></div>
+    </div>
+
+    <script>
+        function formatNumber(x) {
+            return 'Rp ' + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.').replace(/,/g, 'X').replace(/\./g, ',').replace(/X/g, '.');
+        }
+
+        function bulatkanBiaya(biaya) {
+            return (Math.floor(biaya / 1000) + (biaya % 1000 >= 500 ? 1 : 0)) * 1000;
+        }
+
+        function bulatkanHasil(jumlah) {
+            return (Math.floor(jumlah / 500) + (jumlah % 500 >= 250 ? 1 : 0)) * 500;
+        }
+
+        function hitungGadai() {
+            let pinjamanPokok = parseFloat(document.getElementById('pinjamanPokokInput').value);
+            if (isNaN(pinjamanPokok)) {
+                alert('Masukkan nilai pinjaman pokok yang valid.');
+                return;
+            }
+
+            let biayaSewa7Hari = 0.03;
+            let biayaSewa15Hari = 0.05;
+            let biayaSewa30Hari = 0.10;
+            let biayaAdmin = 0.01;
+
+            let sewa7Hari = bulatkanBiaya(pinjamanPokok * biayaSewa7Hari);
+            let sewa15Hari = bulatkanBiaya(pinjamanPokok * biayaSewa15Hari);
+            let sewa30Hari = bulatkanBiaya(pinjamanPokok * biayaSewa30Hari);
+
+            let admin7Hari = bulatkanBiaya(pinjamanPokok * biayaAdmin);
+            let admin15Hari = bulatkanBiaya(pinjamanPokok * biayaAdmin);
+            let admin30Hari = bulatkanBiaya(pinjamanPokok * biayaAdmin);
+
+            let jumlah7Hari = bulatkanHasil(pinjamanPokok - (sewa7Hari + admin7Hari));
+            let jumlah15Hari = bulatkanHasil(pinjamanPokok - (sewa15Hari + admin15Hari));
+            let jumlah30Hari = bulatkanHasil(pinjamanPokok - (sewa30Hari + admin30Hari));
+
+            let hasil = `
+                <p>Hasil perhitungan:</p>
+                <p>- Biaya sewa 7 hari: ${formatNumber(sewa7Hari)}</p>
+                <p>- Biaya administrasi 7 hari: ${formatNumber(admin7Hari)}</p>
+                <p>- Jumlah setelah dipotong (7 hari): ${formatNumber(jumlah7Hari)}</p>
+                <br>
+                <p>- Biaya sewa 15 hari: ${formatNumber(sewa15Hari)}</p>
+                <p>- Biaya administrasi 15 hari: ${formatNumber(admin15Hari)}</p>
+                <p>- Jumlah setelah dipotong (15 hari): ${formatNumber(jumlah15Hari)}</p>
+                <br>
+                <p>- Biaya sewa 30 hari: ${formatNumber(sewa30Hari)}</p>
+                <p>- Biaya administrasi 30 hari: ${formatNumber(admin30Hari)}</p>
+                <p>- Jumlah setelah dipotong (30 hari): ${formatNumber(jumlah30Hari)}</p>
+                <br>
+                <p>© Powered Gadai Sakti Mijen 2024</p>
+            `;
+
+            document.getElementById('hasil').innerHTML = hasil;
+        }
+    </script>
+</body>
+</html>
